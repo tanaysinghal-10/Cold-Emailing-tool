@@ -11,6 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,7 +26,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class GeminiAIService implements AIService {
 
-    private final WebClient geminiWebClient;
+    private final WebClient geminiWebClient; // Keeping it for compatibility elsewhere if needed
     private final PromptTemplateService promptTemplateService;
     private final ObjectMapper objectMapper;
 
@@ -36,6 +41,9 @@ public class GeminiAIService implements AIService {
 
     @Value("${gemini.api.max-output-tokens:2048}")
     private int maxOutputTokens;
+
+    @Value("${gemini.api.base-url:https://api.groq.com/openai/v1/chat/completions}")
+    private String apiUrl;
 
     @Override
     public GeneratedEmail generateColdEmail(JobDetails jobDetails, String resumeSummary) {
@@ -82,51 +90,47 @@ public class GeminiAIService implements AIService {
     }
 
     private String callGemini(String prompt) {
-        String url = String.format("/models/%s:generateContent?key=%s", model, apiKey);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + apiKey);
+        headers.set("Content-Type", "application/json");
 
         Map<String, Object> requestBody = Map.of(
-                "contents", List.of(Map.of(
-                        "parts", List.of(Map.of("text", prompt))
-                )),
-                "generationConfig", Map.of(
-                        "temperature", temperature,
-                        "maxOutputTokens", maxOutputTokens,
-                        "responseMimeType", "text/plain"
-                )
+                "model", model,
+                "messages", new Object[]{
+                        Map.of(
+                                "role", "user",
+                                "content", prompt
+                        )
+                }
         );
 
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
         try {
-            String responseJson = geminiWebClient.post()
-                    .uri(url)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
+            ResponseEntity<String> response = restTemplate.exchange(
+                    apiUrl,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
 
-            return extractTextFromGeminiResponse(responseJson);
+            return extractTextFromGroqResponse(response.getBody());
 
-        } catch (WebClientResponseException e) {
-            log.error("Gemini API error: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("Gemini API call failed: " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Error calling Gemini API: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to call Gemini API: " + e.getMessage(), e);
+            log.error("Error calling Groq API: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to call Groq API: " + e.getMessage(), e);
         }
     }
 
-    private String extractTextFromGeminiResponse(String responseJson) {
+    private String extractTextFromGroqResponse(String responseJson) {
         try {
             JsonNode root = objectMapper.readTree(responseJson);
-            JsonNode candidates = root.path("candidates");
-            if (candidates.isArray() && !candidates.isEmpty()) {
-                JsonNode parts = candidates.get(0).path("content").path("parts");
-                if (parts.isArray() && !parts.isEmpty()) {
-                    return parts.get(0).path("text").asText();
-                }
-            }
-            throw new RuntimeException("Empty response from Gemini API");
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse Gemini response", e);
+            JsonNode contentNode = root.path("choices").get(0).path("message").path("content");
+            return contentNode.asText();
+        } catch (Exception e) {
+            log.error("Failed to parse Groq response", e);
+            throw new RuntimeException("Failed to parse Groq response", e);
         }
     }
 

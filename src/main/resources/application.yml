@@ -7,9 +7,9 @@ spring:
 
   # --- Database ---
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:coldbot}
-    username: ${DB_USERNAME:coldbot}
-    password: ${DB_PASSWORD:coldbot_dev_password}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -35,8 +35,8 @@ spring:
   mail:
     host: ${SMTP_HOST:smtp.gmail.com}
     port: ${SMTP_PORT:587}
-    username: ${SMTP_USERNAME:}
-    password: ${SMTP_PASSWORD:}
+    username: ${SMTP_USERNAME:email_removed}
+    password: ${SMTP_PASSWORD:SMTP_PASSWORD_REMOVED}
     properties:
       mail:
         smtp:
@@ -50,17 +50,28 @@ spring:
 # --- Telegram Bot ---
 telegram:
   bot:
-    token: ${TELEGRAM_BOT_TOKEN:}
-    username: ${TELEGRAM_BOT_USERNAME:}
+    token: ${TELEGRAM_BOT_TOKEN:TELEGRAM_TOKEN_REMOVED}
+    username: ${TELEGRAM_BOT_USERNAME:tanay_cold_email_bot}
+
+# # --- Gemini AI ---
+# gemini:
+#   api:
+#     key: ${GEMINI_API_KEY:GEMINI_KEY_REMOVED}
+#     model: gemini-2.0-flash
+#     base-url: https://generativelanguage.googleapis.com/v1beta
+#     temperature: 0.7
+#     max-output-tokens: 2048
 
 # --- Gemini AI ---
 gemini:
   api:
-    key: ${GEMINI_API_KEY:}
-    model: gemini-2.0-flash
-    base-url: https://generativelanguage.googleapis.com/v1beta
-    temperature: 0.7
-    max-output-tokens: 2048
+    key: ${GEMINI_API_KEY:GROQ_API_KEY_REMOVED}
+    model: openai/gpt-oss-20b
+    base-url: https://api.groq.com/openai/v1/chat/completions
+
+# groqcloud.api.key = 
+# groqcloud.api.url = 
+# groqcloud.model = 
 
 # --- Resume ---
 resume:
@@ -71,8 +82,8 @@ resume:
 email:
   daily-limit: ${EMAIL_DAILY_LIMIT:10}
   from:
-    address: ${SMTP_FROM_EMAIL:}
-    name: ${SMTP_FROM_NAME:Job Applicant}
+    address: ${SMTP_FROM_EMAIL:email_removed}
+    name: ${SMTP_FROM_NAME:Tanay Singhal}
 
 # --- API Security ---
 api:
