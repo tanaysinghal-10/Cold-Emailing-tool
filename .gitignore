@@ -35,6 +35,8 @@ build/
 ### Environment ###
 .env
 *.env.local
+application.yml
+src/main/resources/application.yml
 
 ### Logs ###
 logs/

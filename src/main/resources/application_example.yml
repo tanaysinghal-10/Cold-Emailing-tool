@@ -1,0 +1,101 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cold-email-bot
+
+  # --- Database ---
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:DB_HOST}:${DB_PORT:5432}/${DB_NAME:DB_NAME}
+    username: ${DB_USERNAME:DB_USER}
+    password: ${DB_PASSWORD:DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # --- Flyway ---
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # --- Mail (Gmail SMTP) ---
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:john@doe.com}
+    password: ${SMTP_PASSWORD:Your SMTP Password Here}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+# --- Telegram Bot ---
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:Your Telegram Bot Token Here}
+    username: ${TELEGRAM_BOT_USERNAME:Your Telegram Bot Username Here}
+
+
+# --- Gemini AI ---
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:YOUR_API_KEY_HERE}
+    model: Model name (e.g., gemini-2.0-flash)
+    base-url: Your API base URL (e.g., https://generativelanguage.googleapis.com/v1beta)
+
+# groqcloud.api.key =
+# groqcloud.api.url =
+# groqcloud.model =
+
+# --- Resume ---
+resume:
+  mode: ${RESUME_MODE:MODE_A}
+  static-path: ${RESUME_STATIC_PATH:resumes/Default_Resume.pdf}
+
+# --- Email Rate Limiting ---
+email:
+  daily-limit: ${EMAIL_DAILY_LIMIT:10}
+  from:
+    address: ${SMTP_FROM_EMAIL:john@doe.com}
+    name: ${SMTP_FROM_NAME:Your Name}
+
+# --- API Security ---
+api:
+  security:
+    key: ${API_KEY:dev-api-key-change-me}
+
+# --- Async ---
+async:
+  core-pool-size: 2
+  max-pool-size: 5
+  queue-capacity: 25
+
+# --- Scraping ---
+scraping:
+  timeout-ms: 30000
+  max-retries: 3
+  headless: true
+
+logging:
+  level:
+    com.coldbot: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
