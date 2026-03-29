@@ -24,25 +24,25 @@ import java.util.regex.Pattern;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GeminiAIService implements AIService {
+public class GroqCloudAIService implements AIService {
 
-    private final WebClient geminiWebClient; // Keeping it for compatibility elsewhere if needed
+    private final WebClient groqCloudWebClient; // Keeping it for compatibility elsewhere if needed
     private final PromptTemplateService promptTemplateService;
     private final ObjectMapper objectMapper;
 
-    @Value("${gemini.api.key}")
+    @Value("${groqcloud.api.key}")
     private String apiKey;
 
-    @Value("${gemini.api.model:gemini-2.0-flash}")
+    @Value("${groqcloud.api.model:openai/gpt-oss-20b}")
     private String model;
 
-    @Value("${gemini.api.temperature:0.7}")
+    @Value("${groqcloud.api.temperature:0.7}")
     private double temperature;
 
-    @Value("${gemini.api.max-output-tokens:2048}")
+    @Value("${groqcloud.api.max-output-tokens:2048}")
     private int maxOutputTokens;
 
-    @Value("${gemini.api.base-url:https://api.groq.com/openai/v1/chat/completions}")
+    @Value("${groqcloud.api.base-url:https://api.groq.com/openai/v1/chat/completions}")
     private String apiUrl;
 
     @Override
@@ -58,7 +58,7 @@ public class GeminiAIService implements AIService {
                 "resumeSummary", safe(resumeSummary, "Experienced software professional")
         ));
 
-        String response = callGemini(prompt);
+        String response = callGroqCloud(prompt);
         return parseEmailResponse(response);
     }
 
@@ -74,7 +74,7 @@ public class GeminiAIService implements AIService {
                 "experienceLevel", safe(jobDetails.getExperienceLevel(), "Not specified")
         ));
 
-        return callGemini(prompt);
+        return callGroqCloud(prompt);
     }
 
     @Override
@@ -85,11 +85,11 @@ public class GeminiAIService implements AIService {
                 "rawJdText", rawJdText
         ));
 
-        String response = callGemini(prompt);
+        String response = callGroqCloud(prompt);
         return parseJobDetailsResponse(response);
     }
 
-    private String callGemini(String prompt) {
+    private String callGroqCloud(String prompt) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiKey);

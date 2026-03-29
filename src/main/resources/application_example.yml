@@ -54,16 +54,12 @@ telegram:
     username: ${TELEGRAM_BOT_USERNAME:Your Telegram Bot Username Here}
 
 
-# --- Gemini AI ---
-gemini:
+# --- GroqCloud AI ---
+groqcloud:
   api:
-    key: ${GEMINI_API_KEY:YOUR_API_KEY_HERE}
-    model: Model name (e.g., gemini-2.0-flash)
-    base-url: Your API base URL (e.g., https://generativelanguage.googleapis.com/v1beta)
-
-# groqcloud.api.key =
-# groqcloud.api.url =
-# groqcloud.model =
+    key: ${GROQCLOUD_API_KEY:YOUR_API_KEY_HERE}
+    model: Model name (e.g., openai/gpt-oss-20b)
+    base-url: Your API base URL (e.g., https://api.groq.com/openai/v1/chat/completions)
 
 # --- Resume ---
 resume:
@@ -73,7 +69,7 @@ resume:
 # --- Email Rate Limiting ---
 email:
   generation:
-    mode: ${EMAIL_GENERATION_MODE:HARDCODED}  # Change to AI to use Gemini/Groq instead
+    mode: ${EMAIL_GENERATION_MODE:HARDCODED}  # Change to AI to use GroqCloud instead
     hardcode-subject: "Application for Open Position - {{companyName}}"
     hardcode-body: "Hi {{recruiterName}},\n\nI am writing to express my interest in the open position at {{companyName}}.\n\nI’ve spent the last X years at XYZ focused on Java/Spring Boot microservices and large-scale database migrations. Given my background there and my M.Tech specialization in ML, I think I could jump right in and add value to the engineering team.\n\nI’ve attached my resume for context.\n\nBest regards,\nYour Name"
   daily-limit: ${EMAIL_DAILY_LIMIT:10}

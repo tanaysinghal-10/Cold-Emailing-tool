@@ -11,11 +11,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class AppConfig {
 
-    @Value("${gemini.api.base-url}")
-    private String geminiBaseUrl;
+    @Value("${groqcloud.api.base-url}")
+    private String groqCloudBaseUrl;
 
     @Bean
-    public WebClient geminiWebClient() {
+    public WebClient groqCloudWebClient() {
         // Increase buffer size for large AI responses
         ExchangeStrategies strategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer
@@ -24,7 +24,7 @@ public class AppConfig {
                 .build();
 
         return WebClient.builder()
-                .baseUrl(geminiBaseUrl)
+                .baseUrl(groqCloudBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .exchangeStrategies(strategies)
                 .build();

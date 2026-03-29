@@ -32,5 +32,5 @@ mvn spring-boot:run
 
 See the detailed walkthrough in the artifacts for full setup instructions including:
 - Getting your Telegram Bot Token from @BotFather
-- Getting a free Gemini API key
+- Getting a free GroqCloud API key
 - Creating a Gmail App Password (requires 2FA)
