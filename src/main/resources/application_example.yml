@@ -72,6 +72,10 @@ resume:
 
 # --- Email Rate Limiting ---
 email:
+  generation:
+    mode: ${EMAIL_GENERATION_MODE:HARDCODED}  # Change to AI to use Gemini/Groq instead
+    hardcode-subject: "Application for Open Position - {{companyName}}"
+    hardcode-body: "Hi {{recruiterName}},\n\nI am writing to express my interest in the open position at {{companyName}}.\n\nI’ve spent the last X years at XYZ focused on Java/Spring Boot microservices and large-scale database migrations. Given my background there and my M.Tech specialization in ML, I think I could jump right in and add value to the engineering team.\n\nI’ve attached my resume for context.\n\nBest regards,\nYour Name"
   daily-limit: ${EMAIL_DAILY_LIMIT:10}
   from:
     address: ${SMTP_FROM_EMAIL:john@doe.com}

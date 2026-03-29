@@ -78,8 +78,12 @@ resume:
   mode: ${RESUME_MODE:MODE_A}
   static-path: ${RESUME_STATIC_PATH:resumes/Tanay_Singhal_Resume.pdf}
 
-# --- Email Rate Limiting ---
+# --- Email Rate Limiting & Generation ---
 email:
+  generation:
+    mode: ${EMAIL_GENERATION_MODE:HARDCODED}  # Change to AI to use Gemini/Groq instead
+    hardcode-subject: "Application for Open Position - {{companyName}}"
+    hardcode-body: "Hi {{recruiterName}},\n\nI am writing to express my interest in the open position at {{companyName}}.\n\nI’ve spent the last 3 years at Societe Generale focused on Java/Spring Boot microservices and large-scale database migrations. Given my background there and my M.Tech specialization in ML, I think I could jump right in and add value to the engineering team.\n\nI’ve attached my resume for context.\n\nBest regards,\nTanay Singhal"
   daily-limit: ${EMAIL_DAILY_LIMIT:10}
   from:
     address: ${SMTP_FROM_EMAIL:email_removed}

@@ -23,6 +23,7 @@ import com.coldbot.scraping.JdParserService;
 import com.coldbot.scraping.ScrapingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,15 @@ public class ApplicationOrchestrator {
     private final AuditLogRepository auditLogRepository;
     private final SmtpEmailService smtpEmailService;
 
+    @Value("${email.generation.mode:AI}")
+    private String emailGenerationMode;
+
+    @Value("${email.generation.hardcode-subject:Application for Open Position - {{companyName}}}")
+    private String hardcodeSubject;
+
+    @Value("${email.generation.hardcode-body:Hi {{recruiterName}},\n\nI am writing to express my interest in the open position at {{companyName}}.\n\nI’ve spent the last 3 years at Societe Generale focused on Java/Spring Boot microservices and large-scale database migrations. Given my background there and my M.Tech specialization in ML from IIIT Delhi, I’m confident I can hit the ground running with your engineering team.\n\nI’ve attached my resume for your review.\n\nWith best regards,\nTanay Singhal}")
+    private String hardcodeBody;
+
     @Async("applicationTaskExecutor")
     public void processApplication(CreateApplicationRequest request, Consumer<ApplicationResponse> onUpdate) {
         User user = getOrCreateUser(request.getTelegramChatId());
@@ -67,7 +77,27 @@ public class ApplicationOrchestrator {
             String resumeSummary = resumeService.getResumeSummary(user.getId());
             String resumeFilename = resumeService.getResumeFilename(user.getId(), jobDetails);
             app.setResumeUsed(resumeFilename);
-            GeneratedEmail email = aiService.generateColdEmail(jobDetails, resumeSummary);
+            
+            GeneratedEmail email;
+            if ("HARDCODED".equalsIgnoreCase(emailGenerationMode)) {
+                String subject = hardcodeSubject
+                        .replace("{{companyName}}", jobDetails.getCompanyName() != null ? jobDetails.getCompanyName() : "your company");
+                        
+                String recName = jobDetails.getRecruiterName() != null && !jobDetails.getRecruiterName().isBlank() 
+                        ? jobDetails.getRecruiterName().trim() 
+                        : "Hiring Manager";
+                if (!"Hiring Manager".equals(recName) && recName.contains(" ")) {
+                    recName = recName.substring(0, recName.indexOf(" "));
+                }
+
+                String body = hardcodeBody
+                        .replace("{{recruiterName}}", recName)
+                        .replace("{{companyName}}", jobDetails.getCompanyName() != null ? jobDetails.getCompanyName() : "your company");
+                email = GeneratedEmail.builder().subject(subject).body(body).build();
+                log.info("Using hardcoded email template instead of AI.");
+            } else {
+                email = aiService.generateColdEmail(jobDetails, resumeSummary);
+            }
             app.setGeneratedEmailSubject(email.getSubject());
             app.setGeneratedEmailBody(email.getBody());
             updateStatus(app, ApplicationStatus.EMAIL_GENERATED);
