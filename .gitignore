@@ -45,3 +45,6 @@ logs/
 ### Resumes (user-specific) ###
 resumes/*.pdf
 !resumes/.gitkeep
+
+### Private Documentation ###
+TECHNICAL_QNA.md
