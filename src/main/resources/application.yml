@@ -35,8 +35,8 @@ spring:
   mail:
     host: ${SMTP_HOST:smtp.gmail.com}
     port: ${SMTP_PORT:587}
-    username: ${SMTP_USERNAME:email_removed}
-    password: ${SMTP_PASSWORD:SMTP_PASSWORD_REMOVED}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
     properties:
       mail:
         smtp:
@@ -50,8 +50,8 @@ spring:
 # --- Telegram Bot ---
 telegram:
   bot:
-    token: ${TELEGRAM_BOT_TOKEN:TELEGRAM_TOKEN_REMOVED}
-    username: ${TELEGRAM_BOT_USERNAME:tanay_cold_email_bot}
+    token: ${TELEGRAM_BOT_TOKEN}
+    username: ${TELEGRAM_BOT_USERNAME}
 
 # # --- Gemini AI ---
 # gemini:
@@ -65,9 +65,9 @@ telegram:
 # --- Gemini AI ---
 gemini:
   api:
-    key: ${GEMINI_API_KEY:GROQ_API_KEY_REMOVED}
-    model: openai/gpt-oss-20b
-    base-url: https://api.groq.com/openai/v1/chat/completions
+    key: ${GEMINI_API_KEY}
+    model: ${GEMINI_MODEL:openai/gpt-oss-20b}
+    base-url: ${GEMINI_BASE_URL:https://api.groq.com/openai/v1/chat/completions}
 
 # groqcloud.api.key = 
 # groqcloud.api.url = 
